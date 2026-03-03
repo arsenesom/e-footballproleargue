@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Foot League</title>
+<style>
+body { font-family: Arial, sans-serif; background:#0a0a0a; color:#fff; margin:0; padding:0; }
+header { background:#111; padding:20px; font-size:2em; color:#0ff; text-align:center; letter-spacing:2px; }
+section { padding:20px; max-width:800px; margin:auto; }
+input, button { padding:10px; margin:5px 0; width:100%; font-size:1em; }
+button, a.button { cursor:pointer; background:#0ff; color:#000; border:none; font-weight:bold; text-align:center; display:inline-block; text-decoration:none; margin-top:10px; }
+.match { border:1px solid #0ff; padding:10px; margin:10px 0; border-radius:10px; background:#111; }
+h2 { color:#0ff; text-align:center; margin-bottom:15px; }
+p { margin:5px 0; }
+</style>
+</head>
+<body>
+
+<header>E-Foot League</header>
+
+<section id="inscription">
+<h2>Inscription au tournoi (500 FCFA)</h2>
+<form id="signupForm">
+<input type="text" id="name" placeholder="Nom complet" required>
+<input type="text" id="phone" placeholder="Numéro WhatsApp" required>
+<input type="text" id="efootballID" placeholder="ID e-football" required>
+<a class="button" href="https://momo.africa" target="_blank">Payer 500 FCFA via WAVE</a>
+<button type="submit">Valider l'inscription après paiement</button>
+</form>
+</section>
+
+<section id="tournoi">
+<h2>Phase de poule / Matchs</h2>
+<div id="matches"></div>
+</section>
+
+<section id="classement">
+<h2>Classement et Récompenses</h2>
+<div id="ranking"></div>
+</section>
+
+<script>
+let players = [];
+const matchesDiv = document.getElementById("matches");
+const rankingDiv = document.getElementById("ranking");
+
+// Inscription
+document.getElementById("signupForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    if(players.length >= 50){ alert("Nombre maximum atteint !"); return; }
+    const player = {
+        name: document.getElementById("name").value,
+        phone: document.getElementById("phone").value,
+        efootballID: document.getElementById("efootballID").value,
+        score: 0
+    };
+    players.push(player);
+    alert("Inscription validée ! Vous pouvez maintenant rejoindre la poule.");
+    this.reset();
+    if(players.length >= 5) { formPoule(); }
+});
+
+// Formation automatique des poules
+function formPoule(){
+    matchesDiv.innerHTML = "<h3>Poule formée ! Planning des matchs :</h3>";
+    for(let i=0; i<players.length; i+=2){
+        const match = document.createElement("div");
+        match.className = "match";
+        const player2 = (i+1 < players.length) ? players[i+1] : {name:"BYE", efootballID:""};
+        const codeRoom = Math.floor(100000 + Math.random()*900000);
+        match.innerHTML = `
+        <p><b>${players[i].name}</b> VS <b>${player2.name}</b></p>
+        <a href="https://www.konami.com/efootball/" target="_blank" class="button">Aller jouer sur eFootball</a>
+        <p>Code de salle : <b>${codeRoom}</b></p>
+        <p>Après le match, envoyez la capture du score via WhatsApp au 07 67 92 91 41</p>`;
+        matchesDiv.appendChild(match);
+    }
+}
+
+// Classement simple
+function updateRanking(){
+    rankingDiv.innerHTML = "";
+    const sorted = [...players].sort((a,b)=>b.score - a.score);
+    sorted.forEach((p,index)=>{
+        let prize = "";
+        if(index===0) prize=" - 10 000 FCFA";
+        if(index===1) prize=" - 5 000 FCFA";
+        if(index===2) prize=" - 3 000 FCFA";
+        rankingDiv.innerHTML += `${index+1}. ${p.name} - Score: ${p.score}${prize}<br>`;
+    });
+}
+</script>
+
+</body>
+</html>
